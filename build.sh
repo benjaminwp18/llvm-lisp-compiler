@@ -1,5 +1,10 @@
 mkdir -p build
 cd build
 cmake ..
-make -j8
+if which bear
+then
+	bear -- make -j8
+else
+	make -j8
+fi
 cd ..
