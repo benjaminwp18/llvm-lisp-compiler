@@ -30,6 +30,8 @@ void debugPrint(std::string message, std::string text = "") {
 "or"      { debugPrint("Found", yytext); return LOGICAL_OR; }
 "and"     { debugPrint("Found", yytext); return LOGICAL_AND; }
 "not"     { debugPrint("Found", yytext); return LOGICAL_NOT; }
+"begin"   { debugPrint("Found", yytext); return EXPR_SET; /* Does "BEGIN" collide with lexer #define? */ }
+"fn"      { debugPrint("Found", yytext); return FUNCTION; }
 ">"       { debugPrint("Found", yytext); return RELOP_GT; }
 "<"       { debugPrint("Found", yytext); return RELOP_LT; }
 ">="      { debugPrint("Found", yytext); return RELOP_GE; }
