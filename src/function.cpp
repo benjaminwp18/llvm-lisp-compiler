@@ -32,28 +32,34 @@ ASTFunction::ASTFunction(AST& ast, const std::string& name, std::unique_ptr<VarT
 
 }
 
-void ASTFunction::AddStackVar(ASTFunctionParameter var)
+void ASTFunction::AddStackVar(ASTFunctionParameter var, bool allowRedefns)
 {
-    // Add variable to the scope table and error if it already exists.
-    if (!scopeTable.AddVariable(std::get<1>(var), std::move(std::get<0>(var))))
-    {
+    if (scopeTable.AddVariable(std::get<1>(var), std::move(std::get<0>(var)))) {
+        stackVariables.push_back(std::get<1>(var));
+    } else {
+        std::cout << "=====redef " + std::get<1>(var) + "=====\n";
+        if (!allowRedefns)
         throw std::runtime_error("ERROR: Variable " + std::get<1>(var) + " is already defined in function " + name + "!");
     }
-    stackVariables.push_back(std::get<1>(var));
 }
 
 VarType* ASTFunction::GetVariableType(const std::string& name)
 {
     VarType* ret;
-    if (ret = scopeTable.GetVariableType(name), !ret) // Continue only if function scope table doesn't have value.
+    if (ret = scopeTable.GetVariableType(name), !ret)
     {
-        if (ret = ast.scopeTable.GetVariableType(name), !ret) // Continue only if AST scope table doesn't have value.
-        {
-            throw std::runtime_error("ERROR: In function " + this->name + ", cannot resolve variable or function " + name + " to get its type");
-        }
-        else return ret;
+        InferVarDecl(name);
+    if (ret = scopeTable.GetVariableType(name), !ret) {
+            throw std::runtime_error("ERROR123: In function " + this->name + ", cannot resolve variable or function " + name + " to get its type");
     }
-    else return ret;
+        //if (ret = ast.scopeTable.GetVariableType(name), !ret) // Continue only if AST scope table doesn't have value.
+        //{
+        //    // TODO: properly infer the type. For now just assume int
+        //    throw std::runtime_error("ERROR: In function " + this->name + ", cannot resolve variable or function " + name + " to get its type");
+        //}
+        //else return ret;
+    }
+    return ret;
 }
 
 llvm::Value* ASTFunction::GetVariableValue(const std::string& name)
@@ -61,23 +67,29 @@ llvm::Value* ASTFunction::GetVariableValue(const std::string& name)
     llvm::Value* ret;
     if (ret = scopeTable.GetVariableValue(name), !ret) // Continue only if function scope table doesn't have value.
     {
-        if (ret = ast.scopeTable.GetVariableValue(name), !ret) // Continue only if AST scope table doesn't have value.
-        {
-            throw std::runtime_error("ERROR: In function " + this->name + ", cannot resolve variable or function " + name + " to get its value");
+        InferVarDecl(name);
+    ret = scopeTable.GetVariableValue(name);
+        if (!ret) {
         }
-        else return ret;
+        //if (ret = ast.scopeTable.GetVariableValue(name), !ret) // Continue only if AST scope table doesn't have value.
+        //{
+        //    throw std::runtime_error("ERROR: In function " + this->name + ", cannot resolve variable or function " + name + " to get its value");
+        //}
+        //else return ret;
     }
-    else return ret;
+    //else return ret;
+    return ret;
 }
 
 void ASTFunction::SetVariableValue(const std::string& name, llvm::Value* value)
 {
     if (!scopeTable.SetVariableValue(name, value)) // Continue only if function scope table doesn't have value.
     {
-        if (!ast.scopeTable.SetVariableValue(name, value)) // Continue only if AST scope table doesn't have value.
-        {
-            throw std::runtime_error("ERROR: In function " + this->name + ", cannot resolve variable or function " + name + " to set it");
-        }
+    InferVarDecl(name);
+        //if (!ast.scopeTable.SetVariableValue(name, value)) // Continue only if AST scope table doesn't have value.
+        //{
+        //    throw std::runtime_error("ERROR: In function " + this->name + ", cannot resolve variable or function " + name + " to set it");
+        //}
     }
 }
 
@@ -180,4 +192,15 @@ std::string ASTFunction::ToString(const std::string& prefix)
     std::string output = name + "\n";
     output += prefix + "└──" + (definition == nullptr ? "nullptr\n" : definition->ToString(prefix + "   "));
     return output;
+}
+
+void ASTFunction::InferVarDecl(const std::string& name)
+{
+    // Right now we just always infer the Int type.
+    // TODO: be smarter
+    AddStackVar(std::make_tuple(VarTypeSimple::IntType.Copy(), std::string(name)), true);
+    scopeTable.SetVariableValue(
+        name,
+	llvm::ConstantInt::get(llvm::Type::getInt32Ty(ast.context), 0)
+    );
 }

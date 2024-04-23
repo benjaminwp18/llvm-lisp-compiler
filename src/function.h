@@ -38,6 +38,8 @@ private:
     // Actual Function definition.
     std::unique_ptr<ASTStatement> definition = nullptr;
 
+    void InferVarDecl(const std::string& name);
+
 public:
 
     // Name of the function.
@@ -56,7 +58,7 @@ public:
 
     // Add a new stack variable to the function's scope table. Don't add function parameters, those are already added.
     // var: Variable declaration to add to the stack.
-    void AddStackVar(ASTFunctionParameter var);
+    void AddStackVar(ASTFunctionParameter var, bool allowRedefns = false);
 
     // Get a variable's type. Note that you should not modify the pointer, or else bad things can happen.
     // name: Name of the variable to fetch.

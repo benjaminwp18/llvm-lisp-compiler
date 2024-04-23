@@ -11,14 +11,8 @@
 class AST
 {
 
-    // Main LLVM context. Note: If we want support for multiple compilation units, this should be moved elsewhere.
-    llvm::LLVMContext context;
-
     // Module containing all functions.
     llvm::Module module;
-
-    // Builder to build IR code in functions.
-    llvm::IRBuilder<> builder;
 
     // List of functions to be compiled in order.
     std::vector<std::string> functionList;
@@ -30,6 +24,12 @@ class AST
     bool compiled = false;
 
 public:
+
+    // Builder to build IR code in functions.
+    llvm::IRBuilder<> builder;
+
+    // Main LLVM context. Note: If we want support for multiple compilation units, this should be moved elsewhere.
+    llvm::LLVMContext context;
 
     // Function pass manager for function optimizations.
     llvm::legacy::FunctionPassManager fpm;
