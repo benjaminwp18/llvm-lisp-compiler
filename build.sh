@@ -1,3 +1,4 @@
+echo "Building..."
 mkdir -p build
 cd build
 cmake ..
