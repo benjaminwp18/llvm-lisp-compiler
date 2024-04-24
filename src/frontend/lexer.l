@@ -24,22 +24,14 @@ void debugPrint(std::string message, std::string text = "") {
 "string"  { debugPrint("Found", yytext); return STRING_TYPE; }
 "void"    { debugPrint("Found", yytext); return VOID_TYPE; }
 "bool"    { debugPrint("Found", yytext); return BOOL_TYPE; }
-";"       { debugPrint("Found", yytext); return SEMICOLON; }
 "("       { debugPrint("Found", yytext); return LPAREN; }
 ")"       { debugPrint("Found", yytext); return RPAREN; }
-","       { debugPrint("Found", yytext); return COMMA; }
-"{"       { debugPrint("Found", yytext); return LBRACE; }
-"}"       { debugPrint("Found", yytext); return RBRACE; }
 "if"      { debugPrint("Found", yytext); return IF; }
-"else"    { debugPrint("Found", yytext); return ELSE; }
-"while"   { debugPrint("Found", yytext); return WHILE; }
-"for"     { debugPrint("Found", yytext); return FOR; }
-"break"   { debugPrint("Found", yytext); return BREAK; }
-"return"  { debugPrint("Found", yytext); return RETURN; }
-"="       { debugPrint("Found", yytext); return EQUALS_SIGN; }
-"||"      { debugPrint("Found", yytext); return LOGICAL_OR; }
-"&&"      { debugPrint("Found", yytext); return LOGICAL_AND; }
-"!"       { debugPrint("Found", yytext); return LOGICAL_NOT; }
+"or"      { debugPrint("Found", yytext); return LOGICAL_OR; }
+"and"     { debugPrint("Found", yytext); return LOGICAL_AND; }
+"not"     { debugPrint("Found", yytext); return LOGICAL_NOT; }
+"begin"   { debugPrint("Found", yytext); return EXPR_SET; /* Does "BEGIN" collide with lexer #define? */ }
+"fn"      { debugPrint("Found", yytext); return FUNCTION; }
 ">"       { debugPrint("Found", yytext); return RELOP_GT; }
 "<"       { debugPrint("Found", yytext); return RELOP_LT; }
 ">="      { debugPrint("Found", yytext); return RELOP_GE; }
@@ -50,8 +42,6 @@ void debugPrint(std::string message, std::string text = "") {
 "-"       { debugPrint("Found", yytext); return ARITH_MINUS; }
 "*"       { debugPrint("Found", yytext); return ARITH_MULT; }
 "/"       { debugPrint("Found", yytext); return ARITH_DIV; }
-"%"       { debugPrint("Found", yytext); return ARITH_MOD; }
-"..."     { debugPrint("Found", yytext); return VARIADIC; }
 false|true          { debugPrint("Found bool lit", yytext); yylval.boolval = strcmp(yytext, "true") == 0; return BOOL_LITERAL; }
 [0-9]+              { debugPrint("Found int lit", yytext); yylval.intval = atoi(yytext); return INT_LITERAL; }
 ([0-9]+[.])?[0-9]+  { debugPrint("Found float lit", yytext); yylval.fltval = atof(yytext); return FLOAT_LITERAL; }

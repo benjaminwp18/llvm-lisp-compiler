@@ -2,9 +2,9 @@
 
 std::unique_ptr<VarType> ASTExpressionSubtraction::ReturnType(ASTFunction& func)
 {
-    if (!returnType) // If the return type has not been gotten yet.
+    if (!returnType)
     {
-        if (!ASTExpression::CoerceMathTypes(func, a1, a2, returnType)) // This will force our arguments to be the same type and outputs which one it is.
+        if (!ASTExpression::CoerceMathTypes(func, a1, a2, returnType))
             throw std::runtime_error("ERROR: Can not coerce types in subtraction expression! Are they both either ints or floats?");
     }
     return std::make_unique<VarTypeSimple>(*returnType); // Make a copy of our return type :}
@@ -12,7 +12,7 @@ std::unique_ptr<VarType> ASTExpressionSubtraction::ReturnType(ASTFunction& func)
 
 bool ASTExpressionSubtraction::IsLValue(ASTFunction& func)
 {
-    return false; // If we are adding values together, they must be usable R-Values. Adding these together just results in an R-Value.
+    return false;
 }
 
 llvm::Value* ASTExpressionSubtraction::Compile(llvm::IRBuilder<>& builder, ASTFunction& func)
