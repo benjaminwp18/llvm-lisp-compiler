@@ -24,6 +24,7 @@
   #include "../src/expressions/and.h"
   #include "../src/expressions/or.h"
   #include "../src/statements/block.h"
+  #include "../src/statements/expressionSet.h"
   #include "../src/statements/while.h"
   #include "../src/statements/for.h"
   #include "../src/statements/if.h"
@@ -40,7 +41,7 @@
   void save_to_dot(FILE *);
   int trav_and_write(FILE *, node *);
 
-  AST ast("TestMod");
+  AST ast("LispModule");
 %}
 
 %start program
@@ -76,7 +77,7 @@
 /* %type <stmt> stmt selStmt */
 /* %type <stmtVec> stmts */
 %type <exp> expr relExpr primary call constant variable wrappedExpr
-%type <exprVec> args
+%type <exprVec> exprs
 %type <type> type
 %type <rel> relop
 
@@ -294,6 +295,14 @@ expr:
   
 wrappedExpr:
   LPAREN wrappedExpr RPAREN { $$ = $2; } |
+  EXPR_SET exprs {
+    printf("EXPR SET\n");
+    auto expressions = new ASTExpressionSet();
+    for (auto expr : *$2) {
+      expressions->expressions.push_back(std::unique_ptr<ASTExpression>(expr));
+    }
+    $$ = expressions;
+  } |
   ARITH_PLUS expr expr {
     $$ = new ASTExpressionAddition(std::unique_ptr<ASTExpression>($2), std::unique_ptr<ASTExpression>($3));
   } |
@@ -405,20 +414,20 @@ primary:
 variable:
   ID { $$ = new ASTExpressionVariable($1); }
 call:
-  ID args {
-    // Convert args to a vector of unique ptrs:
-    auto argVec = std::vector<std::unique_ptr<ASTExpression>>();
+  ID exprs {
+    // Convert exprs to a vector of unique ptrs:
+    auto expVec = std::vector<std::unique_ptr<ASTExpression>>();
     for (auto a : *$2) {
-      argVec.push_back(std::unique_ptr<ASTExpression>(a));
+      expVec.push_back(std::unique_ptr<ASTExpression>(a));
     }
-    $$ = new ASTExpressionCall(ASTExpressionVariable::Create($1), std::move(argVec));
+    $$ = new ASTExpressionCall(ASTExpressionVariable::Create($1), std::move(expVec));
   } |
   ID {
-    // If there are no args, then just give it an empty vector
+    // If there are no exprs, then just give it an empty vector
     $$ = new ASTExpressionCall(ASTExpressionVariable::Create($1), std::vector<std::unique_ptr<ASTExpression>>());
   };
-args:
-  args expr {
+exprs:
+  exprs expr {
     $$ = $1;
     $$->push_back($2);
   } |
