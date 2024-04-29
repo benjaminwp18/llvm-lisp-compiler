@@ -17,6 +17,7 @@ void debugPrint(std::string message, std::string text = "") {
 %option noyywrap
 
 %x strlit
+%x comment
 
 %%
 "int"     { debugPrint("Found", yytext); return INT_TYPE; }
@@ -45,6 +46,12 @@ void debugPrint(std::string message, std::string text = "") {
 false|true          { debugPrint("Found bool lit", yytext); yylval.boolval = strcmp(yytext, "true") == 0; return BOOL_LITERAL; }
 [0-9]+              { debugPrint("Found int lit", yytext); yylval.intval = atoi(yytext); return INT_LITERAL; }
 ([0-9]+[.])?[0-9]+  { debugPrint("Found float lit", yytext); yylval.fltval = atof(yytext); return FLOAT_LITERAL; }
+
+#                   { debugPrint("Found comment start"); BEGIN comment; }
+<comment>[^\n]*     { debugPrint("Found comment regular chars", yytext); }
+<comment>\n         { debugPrint("Found comment end (newline)", yytext); BEGIN 0; }
+<comment><<EOF>>    { debugPrint("Found comment end (EOF)", yytext); BEGIN 0; }
+
 
 \"                  { debugPrint("Found str lit start", yytext); BEGIN strlit; ss.str(std::string()); }
 <strlit>[^\\"\n]*   { debugPrint("Found str lit regular chars", yytext); ss << yytext;}

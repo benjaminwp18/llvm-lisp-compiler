@@ -23,11 +23,10 @@
   #include "../src/expressions/comparison.h"
   #include "../src/expressions/and.h"
   #include "../src/expressions/or.h"
-  #include "../src/statements/block.h"
   #include "../src/statements/expressionSet.h"
   #include "../src/statements/while.h"
   #include "../src/statements/for.h"
-  #include "../src/statements/if.h"
+  #include "../src/statements/ifExpr.h"
   #include "../src/statements/return.h"
   #include "../src/types/simple.h"
   extern FILE *yyin;
@@ -76,7 +75,7 @@
 %type <vars> params paramList
 /* %type <stmt> stmt selStmt */
 /* %type <stmtVec> stmts */
-%type <exp> expr relExpr primary call constant variable wrappedExpr
+%type <exp> expr relExpr primary call constant variable wrappedExpr ifExpr funDef
 %type <exprVec> exprs
 %type <type> type
 %type <rel> relop
@@ -141,7 +140,7 @@ varDecs:
   }; */
 
 funDef:
-  FUNCTION type ID LPAREN params RPAREN LPAREN wrappedExpr RPAREN {
+  FUNCTION type ID LPAREN params RPAREN expr {
     // stmts is a "new std::vector<ASTStatement *>()"
     // int i = 0; i < $8->size(); i++
     // $8->at(i)
@@ -160,7 +159,7 @@ funDef:
     printf("ADDING FUNCTION EXPR\n");
     // std::unique_ptr<ASTStatement> statement = std::unique_ptr<ASTStatement>(std::move($8));
     ASTStatementReturn *retStmt = new ASTStatementReturn();
-    retStmt->returnExpression = std::unique_ptr<ASTExpression>($8);
+    retStmt->returnExpression = std::unique_ptr<ASTExpression>($7);
 
     printf("MADE STATEMENTS\n");
 
@@ -191,6 +190,8 @@ funDef:
     func->Define(std::unique_ptr<ASTStatement>(retStmt));
 
     printf("DEFINED FUNCTION\n");
+
+    $$ = new ASTExpressionInt(0);
   };
 params: paramList | { $$ = new std::vector<ASTFunctionParameter *>(); };
 paramList:
@@ -198,9 +199,9 @@ paramList:
     $$ = $1;
     $$->push_back(new ASTFunctionParameter(std::unique_ptr<VarType>($3), $4));
   } |
-  type ID {
+  LPAREN type ID RPAREN {
     $$ = new std::vector<ASTFunctionParameter *>();
-    $$->push_back(new ASTFunctionParameter(std::unique_ptr<VarType>($1), $2));
+    $$->push_back(new ASTFunctionParameter(std::unique_ptr<VarType>($2), $3));
   };
   /* paramList COMMA VARIADIC {
     $$ = new std::vector<ASTFunctionParameter *>();
@@ -324,8 +325,19 @@ wrappedExpr:
   /* LOGICAL_NOT expr {
     $$ = new ASTExpressionNegation(std::unique_ptr<ASTExpression>($2));
   } | */
-  relExpr { $$ = $1; };
+  relExpr { $$ = $1; } |
+  ifExpr { $$ = $1; } |
+  funDef { $$ = $1; } |
+  call { $$ = $1; };
 
+ifExpr:
+  IF expr expr expr {
+    $$ = new ASTExpressionIf(
+      std::unique_ptr<ASTExpression>($2),
+      std::unique_ptr<ASTExpression>($3),
+      std::unique_ptr<ASTExpression>($4)
+    );
+  }
 
   /* orExpr { $$ = $1; } |
   ID EQUALS_SIGN expr {
@@ -415,11 +427,16 @@ variable:
   ID { $$ = new ASTExpressionVariable($1); }
 call:
   ID exprs {
+    printf("CALLING FUNCTION %s\n", $1);
+    fflush(stdout);
     // Convert exprs to a vector of unique ptrs:
     auto expVec = std::vector<std::unique_ptr<ASTExpression>>();
     for (auto a : *$2) {
       expVec.push_back(std::unique_ptr<ASTExpression>(a));
     }
+
+    printf("CREATING EXPRESSSION CALL %s\n", $1);
+    fflush(stdout);
     $$ = new ASTExpressionCall(ASTExpressionVariable::Create($1), std::move(expVec));
   } |
   ID {
