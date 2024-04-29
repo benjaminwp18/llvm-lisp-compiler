@@ -23,11 +23,12 @@
   #include "../src/expressions/comparison.h"
   #include "../src/expressions/and.h"
   #include "../src/expressions/or.h"
-  #include "../src/statements/block.h"
+  // #include "../src/statements/block.h"
   #include "../src/statements/expressionSet.h"
   #include "../src/statements/while.h"
   #include "../src/statements/for.h"
-  #include "../src/statements/if.h"
+  // #include "../src/statements/if.h"
+  #include "../src/statements/ifExpr.h"
   #include "../src/statements/return.h"
   #include "../src/types/simple.h"
   extern FILE *yyin;
@@ -76,7 +77,7 @@
 %type <vars> params paramList
 /* %type <stmt> stmt selStmt */
 /* %type <stmtVec> stmts */
-%type <exp> expr relExpr primary call constant variable wrappedExpr
+%type <exp> expr relExpr primary call constant variable wrappedExpr ifExpr
 %type <exprVec> exprs
 %type <type> type
 %type <rel> relop
@@ -198,9 +199,9 @@ paramList:
     $$ = $1;
     $$->push_back(new ASTFunctionParameter(std::unique_ptr<VarType>($3), $4));
   } |
-  type ID {
+  LPAREN type ID RPAREN {
     $$ = new std::vector<ASTFunctionParameter *>();
-    $$->push_back(new ASTFunctionParameter(std::unique_ptr<VarType>($1), $2));
+    $$->push_back(new ASTFunctionParameter(std::unique_ptr<VarType>($2), $3));
   };
   /* paramList COMMA VARIADIC {
     $$ = new std::vector<ASTFunctionParameter *>();
@@ -324,8 +325,17 @@ wrappedExpr:
   /* LOGICAL_NOT expr {
     $$ = new ASTExpressionNegation(std::unique_ptr<ASTExpression>($2));
   } | */
-  relExpr { $$ = $1; };
+  relExpr { $$ = $1; } |
+  ifExpr { $$ = $1; };
 
+ifExpr:
+  IF expr expr expr {
+    $$ = new ASTExpressionIf(
+      std::unique_ptr<ASTExpression>($2),
+      std::unique_ptr<ASTExpression>($3),
+      std::unique_ptr<ASTExpression>($4)
+    );
+  }
 
   /* orExpr { $$ = $1; } |
   ID EQUALS_SIGN expr {
