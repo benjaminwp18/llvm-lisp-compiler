@@ -4,6 +4,7 @@ A compiler for a bespoke LISP dialect implemented with LLVM
 ## TODO
  - [x] Expression sets (`begin`)
  - [ ] Variable declaration/assignment (hoist declarations)
- - [ ] If/select expressions
+ - [x] If/select expressions
+ - [x] Comments (#)
  - [ ] Lists (include common LISP list functions)
  - [ ] Benchmark against other LISP compilers/interpreters
