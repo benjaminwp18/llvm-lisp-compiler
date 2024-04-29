@@ -18,13 +18,19 @@ public:
     // Create a new call expression.
     // callee: The expression to call.
     // arguments: Arguments to pass to the call.
-    ASTExpressionCall(std::unique_ptr<ASTExpression> callee, std::vector<std::unique_ptr<ASTExpression>> arguments) : callee(std::move(callee)), arguments(std::move(arguments)) {}
+    ASTExpressionCall(std::unique_ptr<ASTExpression> callee, std::vector<std::unique_ptr<ASTExpression>> arguments) :
+        callee(std::move(callee)), arguments(std::move(arguments)) {
+            printf("CONSTRUCTING EXPRESSION CALL\n");
+            fflush(stdout);
+        }
 
     // Create a new call expression.
     // callee: The expression to call.
     // arguments: Arguments to pass to the call.
     static auto Create(std::unique_ptr<ASTExpression> callee, std::vector<std::unique_ptr<ASTExpression>> arguments)
     {
+        printf("CALLING CREATE ON EXPRESSION CALL\n");
+        fflush(stdout);
         return std::make_unique<ASTExpressionCall>(std::move(callee), std::move(arguments));
     }
 

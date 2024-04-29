@@ -75,7 +75,7 @@
 %type <vars> params paramList
 /* %type <stmt> stmt selStmt */
 /* %type <stmtVec> stmts */
-%type <exp> expr relExpr primary call constant variable wrappedExpr ifExpr
+%type <exp> expr relExpr primary call constant variable wrappedExpr ifExpr funDef
 %type <exprVec> exprs
 %type <type> type
 %type <rel> relop
@@ -190,6 +190,8 @@ funDef:
     func->Define(std::unique_ptr<ASTStatement>(retStmt));
 
     printf("DEFINED FUNCTION\n");
+
+    $$ = new ASTExpressionInt(0);
   };
 params: paramList | { $$ = new std::vector<ASTFunctionParameter *>(); };
 paramList:
@@ -324,7 +326,9 @@ wrappedExpr:
     $$ = new ASTExpressionNegation(std::unique_ptr<ASTExpression>($2));
   } | */
   relExpr { $$ = $1; } |
-  ifExpr { $$ = $1; };
+  ifExpr { $$ = $1; } |
+  funDef { $$ = $1; } |
+  call { $$ = $1; };
 
 ifExpr:
   IF expr expr expr {
@@ -423,11 +427,16 @@ variable:
   ID { $$ = new ASTExpressionVariable($1); }
 call:
   ID exprs {
+    printf("CALLING FUNCTION %s\n", $1);
+    fflush(stdout);
     // Convert exprs to a vector of unique ptrs:
     auto expVec = std::vector<std::unique_ptr<ASTExpression>>();
     for (auto a : *$2) {
       expVec.push_back(std::unique_ptr<ASTExpression>(a));
     }
+
+    printf("CREATING EXPRESSSION CALL %s\n", $1);
+    fflush(stdout);
     $$ = new ASTExpressionCall(ASTExpressionVariable::Create($1), std::move(expVec));
   } |
   ID {
