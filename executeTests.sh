@@ -5,6 +5,8 @@ function runTest {
     lli tests/$1.ll &> tests/$1Execution.log
 }
 
+. cleanTests.sh
+
 # Run all the C file tests.
 for file in "tests"/*.lisp; do
     file=$(basename $file .lisp)

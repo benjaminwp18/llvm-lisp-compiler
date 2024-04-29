@@ -58,7 +58,7 @@ llvm::Value* ASTExpressionIf::Compile(llvm::IRBuilder<>& builder, ASTFunction& f
 
 std::string ASTExpressionIf::ToString(const std::string& prefix)
 {
-    std::string output = "if " + condition->ToString("") + "\n";
+    std::string output = "if " + condition->ToString(prefix) + "\n";
     output += prefix + (thenExpression ? "├──" : "└──") + thenExpression->ToString(prefix + "   ");
     output += prefix + (elseExpression ? "├──" : "└──") + elseExpression->ToString(prefix + "   ");
     return output;

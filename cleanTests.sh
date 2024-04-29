@@ -1,0 +1,1 @@
+rm tests/*.ll tests/*.log

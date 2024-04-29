@@ -142,7 +142,7 @@ varDecs:
   }; */
 
 funDef:
-  FUNCTION type ID LPAREN params RPAREN LPAREN wrappedExpr RPAREN {
+  FUNCTION type ID LPAREN params RPAREN expr {
     // stmts is a "new std::vector<ASTStatement *>()"
     // int i = 0; i < $8->size(); i++
     // $8->at(i)
@@ -161,7 +161,7 @@ funDef:
     printf("ADDING FUNCTION EXPR\n");
     // std::unique_ptr<ASTStatement> statement = std::unique_ptr<ASTStatement>(std::move($8));
     ASTStatementReturn *retStmt = new ASTStatementReturn();
-    retStmt->returnExpression = std::unique_ptr<ASTExpression>($8);
+    retStmt->returnExpression = std::unique_ptr<ASTExpression>($7);
 
     printf("MADE STATEMENTS\n");
 
