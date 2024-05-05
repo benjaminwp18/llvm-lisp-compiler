@@ -4,7 +4,7 @@
 
 std::unique_ptr<VarType> ASTExpressionVariable::ReturnType(ASTFunction& func)
 {
-    printf("COMPILING: CHECKING VARIABLE RETURN TYPE\n");
+    printf("COMPILING: CHECKING VARIABLE %s RETURN TYPE\n", var.c_str());
     fflush(stdout);
     return func.GetVariableType(var)->Copy(); // We just need to resolve the variable and copy its type.
 }
@@ -19,10 +19,17 @@ bool ASTExpressionVariable::IsLValue(ASTFunction& func)
 
 llvm::Value* ASTExpressionVariable::Compile(llvm::IRBuilder<>& builder, ASTFunction& func)
 {
+    printf("COMPILING: COMPILING VARIABLE %s FOR VALUE\n", var.c_str());
+    fflush(stdout);
     return func.GetVariableValue(var); // Simply just return the value from the scope table.
 }
 
 std::string ASTExpressionVariable::ToString(const std::string& prefix)
 {
     return var + "\n";
+}
+
+std::string ASTExpressionVariable::getVariableString()
+{
+    return var;
 }

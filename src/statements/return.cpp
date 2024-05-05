@@ -4,6 +4,8 @@
 
 std::unique_ptr<VarType> ASTStatementReturn::StatementReturnType(ASTFunction& func)
 {
+    printf("COMPILING: CHECKING RETURN STATEMENT RETURN TYPE\n");
+    fflush(stdout);
     // If the contained statement returns something, return it.
     // Otherwise, we return void.
     return returnExpression ? returnExpression->ReturnType(func) : VarTypeSimple::VoidType.Copy();

@@ -5,7 +5,8 @@
 #include "types/simple.h"
 #include <llvm/IR/Verifier.h>
 
-ASTFunction::ASTFunction(AST& ast, const std::string& name, std::unique_ptr<VarType> returnType, ASTFunctionParameters parameters, bool variadic) : ast(ast), name(name)
+ASTFunction::ASTFunction(AST& ast, const std::string& name, std::unique_ptr<VarType> returnType,
+    ASTFunctionParameters parameters, bool variadic) : ast(ast), name(name)
 {
 
     // Create the function type.
@@ -40,6 +41,7 @@ void ASTFunction::AddStackVar(ASTFunctionParameter var)
         throw std::runtime_error("ERROR: Variable " + std::get<1>(var) + " is already defined in function " + name + "!");
     }
     stackVariables.push_back(std::get<1>(var));
+
 }
 
 VarType* ASTFunction::GetVariableType(const std::string& name)

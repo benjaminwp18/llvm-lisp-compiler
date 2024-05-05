@@ -4,6 +4,8 @@
 #include "expressions/int2Bool.h"
 #include "expressions/int2Float.h"
 
+#include <iostream>
+
 llvm::Value* ASTExpression::CompileRValue(llvm::IRBuilder<>& builder, ASTFunction& func)
 {
     llvm::Value* raw = Compile(builder, func); // First get the naturally compiled value.
@@ -163,4 +165,8 @@ void ASTExpression::Compile(llvm::Module& mod, llvm::IRBuilder<>& builder, ASTFu
     // We can compile the expression itself, we just don't return anything since this is an expression and not a return statement.
     Compile(builder, func);
 
+}
+
+std::string ASTExpression::getVariableString() {
+    throw std::runtime_error("Not implemented");
 }

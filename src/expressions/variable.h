@@ -28,4 +28,6 @@ public:
     bool IsLValue(ASTFunction& func) override;
     llvm::Value* Compile(llvm::IRBuilder<>& builder, ASTFunction& func) override;
     std::string ToString(const std::string& prefix) override;
+
+    std::string getVariableString();
 };

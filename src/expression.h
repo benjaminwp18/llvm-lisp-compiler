@@ -70,4 +70,7 @@ public:
     // Must make the destructor virtual to make the compiler happy.
     ~ASTExpression() override = default;
 
+    // Get the string for variables
+    // Not implemented in other expressions
+    std::string getVariableString();
 };

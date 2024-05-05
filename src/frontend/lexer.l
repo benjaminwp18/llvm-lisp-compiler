@@ -43,6 +43,7 @@ void debugPrint(std::string message, std::string text = "") {
 "-"       { debugPrint("Found", yytext); return ARITH_MINUS; }
 "*"       { debugPrint("Found", yytext); return ARITH_MULT; }
 "/"       { debugPrint("Found", yytext); return ARITH_DIV; }
+"="       { debugPrint("Found", yytext); return EQUALS_SIGN; }
 false|true          { debugPrint("Found bool lit", yytext); yylval.boolval = strcmp(yytext, "true") == 0; return BOOL_LITERAL; }
 [0-9]+              { debugPrint("Found int lit", yytext); yylval.intval = atoi(yytext); return INT_LITERAL; }
 ([0-9]+[.])?[0-9]+  { debugPrint("Found float lit", yytext); yylval.fltval = atof(yytext); return FLOAT_LITERAL; }
