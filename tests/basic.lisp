@@ -1,1 +1,1 @@
-(fn int main () (+ 1 2))
+(fn int main () () (+ 1 2))

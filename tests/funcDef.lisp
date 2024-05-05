@@ -1,4 +1,4 @@
-(fn int main ((int x) (int y)) (
+(fn int main ((int x) (int y)) () (
     begin
         (fn int add ((int x) (int y)) (
             + x y
