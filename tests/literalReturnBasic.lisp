@@ -1,3 +1,3 @@
-(fn float main () (
+(fn float main () () (
     3.2
 ))
