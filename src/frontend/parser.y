@@ -23,10 +23,8 @@
   #include "../src/expressions/comparison.h"
   #include "../src/expressions/and.h"
   #include "../src/expressions/or.h"
-  #include "../src/statements/expressionSet.h"
-  #include "../src/statements/while.h"
-  #include "../src/statements/for.h"
-  #include "../src/statements/ifExpr.h"
+  #include "../src/expressions/expressionSet.h"
+  #include "../src/expressions/ifExpr.h"
   #include "../src/statements/return.h"
   #include "../src/types/simple.h"
   extern FILE *yyin;
