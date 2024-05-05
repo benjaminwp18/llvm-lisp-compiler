@@ -77,7 +77,15 @@
 
 %%
 // AST does not support global variables, so the only declarations are functions
-program: LPAREN funDef RPAREN;
+program:
+  exprs {
+    printf("EXPR SET\n");
+    auto expressions = std::unique_ptr<ASTExpressionSet>(new ASTExpressionSet());
+    for (auto expr : *$1) {
+      expressions->expressions.push_back(std::unique_ptr<ASTExpression>(expr));
+    }
+    ast.SetExpressionSet(std::move(expressions));
+  };
 // decList: decList dec | dec ;
 // dec: funDef;
 

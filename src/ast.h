@@ -2,6 +2,7 @@
 
 #include "function.h"
 #include "scopeTable.h"
+#include "expressions/expressionSet.h"
 #include <llvm/IR/IRBuilder.h>
 #include <llvm/IR/LegacyPassManager.h>
 #include <llvm/IR/LLVMContext.h>
@@ -26,6 +27,9 @@ class AST
     // Map function names to values.
     std::map<std::string, std::unique_ptr<ASTFunction>> functions;
 
+    // Top-level expression set
+    std::unique_ptr<ASTExpressionSet> expressionSet;
+
     // If the module has been compiled or not.
     bool compiled = false;
 
@@ -40,6 +44,8 @@ public:
     // Create a new abstract syntax tree.
     // modName: Name of the module to create.
     AST(std::string modName);
+
+    void SetExpressionSet(std::unique_ptr<ASTExpressionSet> expressionSet);
 
     // Add a function to the AST.
     // name: Name of the function to create.

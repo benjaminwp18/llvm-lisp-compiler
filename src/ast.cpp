@@ -8,7 +8,8 @@
 #include <llvm/Transforms/Scalar/GVN.h>
 #include <llvm/Transforms/Utils.h>
 
-AST::AST(const std::string modName) : module(modName, context), builder(context), fpm(&module)
+AST::AST(const std::string modName) :
+    module(modName, context), builder(context), fpm(&module)
 {
 
     // This requires the above includes that don't work on my machine, so I can't really add these default optimizations.
@@ -39,38 +40,36 @@ AST::AST(const std::string modName) : module(modName, context), builder(context)
 
 }
 
+void AST::SetExpressionSet(std::unique_ptr<ASTExpressionSet> expressionSet) {
+    this->expressionSet = std::move(expressionSet);
+}
+
 ASTFunction* AST::AddFunction(const std::string& name, std::unique_ptr<VarType> returnType, ASTFunctionParameters parameters, bool variadic)
 {
-
     // Add to our function list.
     auto func = std::make_unique<ASTFunction>(*this, name, std::move(returnType), std::move(parameters), variadic);
     functionList.push_back(name);
     functions[name] = std::move(func);
     return functions[name].get();
-
 }
 
 ASTFunction* AST::GetFunction(const std::string& name)
 {
-
     // Get function if exists.
     auto found = functions.find(name);
     if (found != functions.end()) return found->second.get();
     else throw std::runtime_error("ERROR: Function " + name + " can not be found in the ast!");
-
 }
 
 void AST::Compile()
 {
-
-    // All we need to do is compile each function.
-    for (auto& func : functionList)
-    {
-        std::cout << "INFO: Compiling function " + func + "." << std::endl;
-        functions[func]->Compile(module, builder);
-    }
+    // for (auto& func : functionList)
+    // {
+    //     std::cout << "INFO: Compiling function " + func + "." << std::endl;
+    //     functions[func]->Compile(module, builder);
+    // }
     compiled = true;
-
+    expressionSet->Compile(builder, *this);
 }
 
 std::string AST::ToString()
